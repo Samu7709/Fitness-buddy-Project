@@ -1,0 +1,34 @@
+# ============================================================
+# Fitness Buddy AI — Python Dependencies
+# ============================================================
+
+# Web Framework
+Flask==3.0.0
+Werkzeug==3.0.1
+
+# Environment variable management
+python-dotenv==1.0.0
+
+# IBM Watsonx.ai SDK
+ibm-watsonx-ai==1.1.2
+
+# IBM Cloud Authentication
+ibm-cloud-sdk-core==3.20.3
+
+# HTTP Requests
+requests==2.31.0
+
+# Data handling
+numpy==1.26.4
+
+# Date/time utilities (already in stdlib but useful)
+python-dateutil==2.8.2
+
+# CORS support for API calls
+flask-cors==4.0.0
+
+# Session management
+Flask-Session==0.6.0
+
+# Gunicorn for production deployment
+gunicorn==21.2.0
