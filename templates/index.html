@@ -1,1 +1,151 @@
+{% extends "base.html" %}
+{% block title %}{{ agent_name }} — Your AI Fitness Coach{% endblock %}
 
+{% block content %}
+
+<!-- ════ HERO SECTION ════ -->
+<section class="hero-section">
+  <div class="hero-bg-shapes">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+  </div>
+  <div class="container text-center position-relative z-1 py-5">
+    <div class="hero-badge animate-fade-up">
+      <i class="bi bi-stars me-1"></i> Powered by IBM Watsonx.ai + Granite
+    </div>
+    <h1 class="hero-title animate-fade-up delay-1">
+      Your Personal<br><span class="text-gradient">AI Fitness Coach</span>
+    </h1>
+    <p class="hero-subtitle animate-fade-up delay-2">
+      Personalised workouts, healthy Indian meals, BMI tracking,<br class="d-none d-md-block">
+      and daily motivation — all in one place. <strong>Free. Smart. Yours.</strong>
+    </p>
+    <div class="d-flex flex-wrap gap-3 justify-content-center mt-4 animate-fade-up delay-3">
+      <a href="{{ url_for('dashboard') }}" class="btn btn-hero-primary btn-lg rounded-pill px-5">
+        <i class="bi bi-rocket-takeoff-fill me-2"></i>Get Started
+      </a>
+      <a href="{{ url_for('chat') }}" class="btn btn-hero-outline btn-lg rounded-pill px-5">
+        <i class="bi bi-chat-dots-fill me-2"></i>Chat with AI
+      </a>
+    </div>
+
+    <!-- Daily Tip Card -->
+    <div class="daily-tip-card animate-fade-up delay-4 mt-5">
+      <div class="d-flex align-items-center gap-3">
+        <div class="tip-icon">
+          <i class="bi bi-lightbulb-fill"></i>
+        </div>
+        <div class="text-start">
+          <div class="tip-label">Today's Tip</div>
+          <div class="tip-text">{{ daily_tip }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════ FEATURES GRID ════ -->
+<section class="features-section py-5">
+  <div class="container">
+    <div class="section-header text-center mb-5">
+      <h2 class="section-title">Everything You Need to Get Fit</h2>
+      <p class="text-muted">A complete fitness companion right in your browser.</p>
+    </div>
+    <div class="row g-4">
+      {% set features = [
+        ("chat", "AI Fitness Chat", "bi-chat-dots-fill", "Chat naturally with your AI coach powered by IBM Granite. Ask anything about fitness, nutrition, or motivation.", "primary"),
+        ("bmi_page", "BMI Calculator", "bi-calculator-fill", "Calculate your BMI instantly and get personalised advice including your ideal weight range and next steps.", "success"),
+        ("workout_page", "Workout Planner", "bi-heart-pulse-fill", "Home workout plans for beginners to advanced — no gym needed! Includes warm-up, workout & cool-down.", "warning"),
+        ("meals_page", "Indian Meal Plans", "bi-egg-fried", "Healthy, delicious, desi meal plans tailored to your goal — weight loss, muscle gain, or balanced living.", "danger"),
+        ("habits_page", "Habit Tracker", "bi-check2-circle", "Track water intake, sleep, workout streaks, and daily habits to build a consistent healthy lifestyle.", "info"),
+        ("profile_page", "Profile & Goals", "bi-person-circle", "Set your fitness goals, body stats, and preferences. The AI personalises everything around you.", "secondary"),
+      ] %}
+      {% for endpoint, title, icon, desc, color in features %}
+      <div class="col-sm-6 col-lg-4">
+        <a href="{{ url_for(endpoint) }}" class="feature-card feature-{{ color }} text-decoration-none">
+          <div class="feature-icon-wrap">
+            <i class="bi {{ icon }}"></i>
+          </div>
+          <h5 class="feature-title">{{ title }}</h5>
+          <p class="feature-desc">{{ desc }}</p>
+          <span class="feature-link">
+            Explore <i class="bi bi-arrow-right"></i>
+          </span>
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- ════ STATS BANNER ════ -->
+<section class="stats-banner py-5">
+  <div class="container">
+    <div class="row g-4 text-center">
+      <div class="col-6 col-md-3">
+        <div class="stat-item">
+          <div class="stat-number">4+</div>
+          <div class="stat-label">Workout Plans</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-item">
+          <div class="stat-number">3</div>
+          <div class="stat-label">Indian Meal Plans</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-item">
+          <div class="stat-number">15+</div>
+          <div class="stat-label">Daily Fitness Tips</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-item">
+          <div class="stat-number">∞</div>
+          <div class="stat-label">AI Conversations</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════ HOW IT WORKS ════ -->
+<section class="how-section py-5">
+  <div class="container">
+    <div class="section-header text-center mb-5">
+      <h2 class="section-title">How It Works</h2>
+    </div>
+    <div class="row g-4 justify-content-center">
+      <div class="col-md-4 text-center">
+        <div class="step-circle">1</div>
+        <h5 class="mt-3 fw-bold">Set Your Profile</h5>
+        <p class="text-muted">Enter your age, weight, height, goal, and diet preference. It takes 30 seconds.</p>
+      </div>
+      <div class="col-md-4 text-center">
+        <div class="step-circle">2</div>
+        <h5 class="mt-3 fw-bold">Get Personalised Plans</h5>
+        <p class="text-muted">AI generates a workout plan and meal plan perfectly suited to your body and goals.</p>
+      </div>
+      <div class="col-md-4 text-center">
+        <div class="step-circle">3</div>
+        <h5 class="mt-3 fw-bold">Track & Improve</h5>
+        <p class="text-muted">Use the habit tracker and chat with your AI coach daily to stay consistent and motivated.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════ CTA ════ -->
+<section class="cta-section py-5 text-center">
+  <div class="container">
+    <h2 class="fw-bold mb-3">Ready to transform your health?</h2>
+    <p class="text-muted mb-4">Kal se nahi — aaj se! Start your fitness journey today. It's completely free.</p>
+    <a href="{{ url_for('profile_page') }}" class="btn btn-hero-primary btn-lg rounded-pill px-5">
+      <i class="bi bi-person-plus-fill me-2"></i>Create My Profile
+    </a>
+  </div>
+</section>
+
+{% endblock %}
