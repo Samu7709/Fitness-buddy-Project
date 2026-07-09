@@ -1,0 +1,286 @@
+{% extends "base.html" %}
+{% block title %}BMI Calculator — {{ agent_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="page-header mb-4">
+    <h1 class="page-title">
+      <i class="bi bi-calculator-fill me-2 text-success"></i>BMI Calculator
+    </h1>
+    <p class="text-muted">Calculate your Body Mass Index and get personalised health advice.</p>
+  </div>
+
+  <div class="row g-4">
+
+    <!-- ── Calculator Form ── -->
+    <div class="col-lg-5">
+      <div class="dash-card">
+        <div class="dash-card-header">
+          <i class="bi bi-rulers me-2"></i>Enter Your Measurements
+        </div>
+        <div class="dash-card-body">
+          <div class="mb-4">
+            <label class="form-label fw-semibold">Weight (kg)</label>
+            <div class="input-group">
+              <input type="number" class="form-control form-control-lg"
+                     id="bmiWeight" placeholder="e.g. 70"
+                     value="{{ profile.weight }}" min="30" max="300" step="0.1">
+              <span class="input-group-text">kg</span>
+            </div>
+          </div>
+          <div class="mb-4">
+            <label class="form-label fw-semibold">Height (cm)</label>
+            <div class="input-group">
+              <input type="number" class="form-control form-control-lg"
+                     id="bmiHeight" placeholder="e.g. 170"
+                     value="{{ profile.height }}" min="100" max="250" step="0.1">
+              <span class="input-group-text">cm</span>
+            </div>
+          </div>
+          <button class="btn btn-success btn-lg w-100 rounded-pill" onclick="calculateBMI()">
+            <i class="bi bi-calculator-fill me-2"></i>Calculate BMI
+          </button>
+        </div>
+      </div>
+
+      <!-- BMI Scale Reference -->
+      <div class="dash-card mt-4">
+        <div class="dash-card-header">
+          <i class="bi bi-bar-chart-fill me-2"></i>BMI Scale Reference
+        </div>
+        <div class="dash-card-body">
+          <div class="bmi-scale">
+            <div class="bmi-range bmi-underweight">
+              <span class="bmi-range-label">Underweight</span>
+              <span class="bmi-range-value">&lt; 18.5</span>
+            </div>
+            <div class="bmi-range bmi-normal">
+              <span class="bmi-range-label">Normal</span>
+              <span class="bmi-range-value">18.5 – 24.9</span>
+            </div>
+            <div class="bmi-range bmi-overweight">
+              <span class="bmi-range-label">Overweight</span>
+              <span class="bmi-range-value">25.0 – 29.9</span>
+            </div>
+            <div class="bmi-range bmi-obese">
+              <span class="bmi-range-label">Obese</span>
+              <span class="bmi-range-value">&ge; 30.0</span>
+            </div>
+          </div>
+          <p class="text-muted small mt-3 mb-0">
+            <i class="bi bi-info-circle me-1"></i>
+            BMI is a screening tool, not a diagnostic measure.
+            Consult a healthcare professional for a complete assessment.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Results Panel ── -->
+    <div class="col-lg-7">
+      <!-- Loading state (hidden) -->
+      <div id="bmiLoading" class="dash-card d-none">
+        <div class="dash-card-body text-center py-5">
+          <div class="spinner-border text-success mb-3"></div>
+          <p class="text-muted">Calculating your BMI...</p>
+        </div>
+      </div>
+
+      <!-- Result card (hidden until calculated) -->
+      <div id="bmiResult" class="d-none">
+        <div class="dash-card bmi-result-card mb-4" id="bmiResultCard">
+          <div class="dash-card-body text-center py-4">
+            <div class="bmi-emoji mb-2" id="bmiEmoji">✅</div>
+            <div class="bmi-score" id="bmiScore">—</div>
+            <div class="bmi-score-label">Your BMI</div>
+            <div class="mt-2">
+              <span class="badge bmi-category-badge" id="bmiCategory">—</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="dash-card mb-4">
+          <div class="dash-card-header">
+            <i class="bi bi-chat-quote-fill me-2 text-accent"></i>AI Advice for You
+          </div>
+          <div class="dash-card-body">
+            <p class="mb-0" id="bmiAdvice">—</p>
+          </div>
+        </div>
+
+        <div class="row g-3 mb-4">
+          <div class="col-6">
+            <div class="dash-card text-center">
+              <div class="dash-card-body">
+                <div class="fw-bold fs-5 text-success" id="idealMin">—</div>
+                <div class="text-muted small">Ideal Min Weight</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="dash-card text-center">
+              <div class="dash-card-body">
+                <div class="fw-bold fs-5 text-success" id="idealMax">—</div>
+                <div class="text-muted small">Ideal Max Weight</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Calorie Calculator (shows after BMI) -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <i class="bi bi-fire me-2 text-warning"></i>Daily Calorie Needs
+          </div>
+          <div class="dash-card-body">
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Age</label>
+                <input type="number" class="form-control" id="calAge" value="{{ profile.age }}" min="10" max="100">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Gender</label>
+                <select class="form-select" id="calGender">
+                  <option value="male" {% if profile.gender == 'male' %}selected{% endif %}>Male</option>
+                  <option value="female" {% if profile.gender == 'female' %}selected{% endif %}>Female</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Activity Level</label>
+                <select class="form-select" id="calActivity">
+                  {% for val, lbl in [('sedentary','Sedentary (desk job)'),('light','Light (1-3 days/wk)'),('moderate','Moderate (3-5 days/wk)'),('active','Active (6-7 days/wk)'),('very_active','Very Active (athlete)')] %}
+                  <option value="{{ val }}" {% if profile.activity_level == val %}selected{% endif %}>{{ lbl }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Goal</label>
+                <select class="form-select" id="calGoal">
+                  <option value="weight_loss" {% if profile.goal == 'weight_loss' %}selected{% endif %}>Weight Loss</option>
+                  <option value="balanced" {% if profile.goal == 'balanced' %}selected{% endif %}>Maintenance</option>
+                  <option value="muscle_gain" {% if profile.goal == 'muscle_gain' %}selected{% endif %}>Muscle Gain</option>
+                </select>
+              </div>
+            </div>
+            <button class="btn btn-warning w-100 rounded-pill" onclick="calculateCalories()">
+              <i class="bi bi-fire me-2"></i>Calculate Calories
+            </button>
+            <div id="calorieResult" class="d-none mt-4">
+              <div class="row g-3 text-center">
+                <div class="col-4">
+                  <div class="cal-stat">
+                    <div class="cal-value text-warning" id="calBMR">—</div>
+                    <div class="cal-label">BMR</div>
+                  </div>
+                </div>
+                <div class="col-4">
+                  <div class="cal-stat">
+                    <div class="cal-value text-info" id="calTDEE">—</div>
+                    <div class="cal-label">Maintenance</div>
+                  </div>
+                </div>
+                <div class="col-4">
+                  <div class="cal-stat">
+                    <div class="cal-value text-success" id="calTarget">—</div>
+                    <div class="cal-label">Target</div>
+                  </div>
+                </div>
+              </div>
+              <div class="row g-2 text-center mt-2">
+                <div class="col-4">
+                  <div class="macro-badge bg-danger bg-opacity-10 text-danger">
+                    <div class="fw-bold" id="calProtein">—g</div>
+                    <div class="small">Protein</div>
+                  </div>
+                </div>
+                <div class="col-4">
+                  <div class="macro-badge bg-warning bg-opacity-10 text-warning">
+                    <div class="fw-bold" id="calCarbs">—g</div>
+                    <div class="small">Carbs</div>
+                  </div>
+                </div>
+                <div class="col-4">
+                  <div class="macro-badge bg-info bg-opacity-10 text-info">
+                    <div class="fw-bold" id="calFat">—g</div>
+                    <div class="small">Fat</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Placeholder before calculation -->
+      <div id="bmiPlaceholder" class="dash-card text-center py-5">
+        <i class="bi bi-calculator display-1 text-muted mb-3"></i>
+        <h5 class="text-muted">Enter your weight and height</h5>
+        <p class="text-muted small">Your BMI result and personalised advice will appear here.</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+async function calculateBMI() {
+  const weight = parseFloat(document.getElementById('bmiWeight').value);
+  const height = parseFloat(document.getElementById('bmiHeight').value);
+  if (!weight || !height || weight < 30 || height < 100) {
+    alert('Please enter valid weight (30-300 kg) and height (100-250 cm).');
+    return;
+  }
+  document.getElementById('bmiPlaceholder').classList.add('d-none');
+  document.getElementById('bmiResult').classList.add('d-none');
+  document.getElementById('bmiLoading').classList.remove('d-none');
+  try {
+    const res = await fetch('/api/bmi', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({weight, height})
+    });
+    const d = await res.json();
+    document.getElementById('bmiScore').textContent = d.bmi;
+    document.getElementById('bmiCategory').textContent = d.category;
+    document.getElementById('bmiEmoji').textContent = d.emoji;
+    document.getElementById('bmiAdvice').textContent = d.advice;
+    document.getElementById('idealMin').textContent = d.ideal_min + ' kg';
+    document.getElementById('idealMax').textContent = d.ideal_max + ' kg';
+    const card = document.getElementById('bmiResultCard');
+    card.className = `dash-card bmi-result-card mb-4 bmi-result-${d.color}`;
+    const badge = document.getElementById('bmiCategory');
+    badge.className = `badge bmi-category-badge bg-${d.color}`;
+    document.getElementById('bmiLoading').classList.add('d-none');
+    document.getElementById('bmiResult').classList.remove('d-none');
+  } catch(e) {
+    alert('Calculation error. Please try again.');
+    document.getElementById('bmiLoading').classList.add('d-none');
+    document.getElementById('bmiPlaceholder').classList.remove('d-none');
+  }
+}
+
+async function calculateCalories() {
+  const weight = parseFloat(document.getElementById('bmiWeight').value);
+  const height = parseFloat(document.getElementById('bmiHeight').value);
+  const age = parseInt(document.getElementById('calAge').value);
+  const gender = document.getElementById('calGender').value;
+  const activity = document.getElementById('calActivity').value;
+  const goal = document.getElementById('calGoal').value;
+  if (!weight || !height || !age) { alert('Please calculate BMI first.'); return; }
+  try {
+    const res = await fetch('/api/calories', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({weight, height, age, gender, activity_level: activity, goal})
+    });
+    const d = await res.json();
+    document.getElementById('calBMR').textContent = d.bmr + ' kcal';
+    document.getElementById('calTDEE').textContent = d.tdee + ' kcal';
+    document.getElementById('calTarget').textContent = d.target_calories + ' kcal';
+    document.getElementById('calProtein').textContent = d.protein_g + 'g';
+    document.getElementById('calCarbs').textContent = d.carbs_g + 'g';
+    document.getElementById('calFat').textContent = d.fat_g + 'g';
+    document.getElementById('calorieResult').classList.remove('d-none');
+  } catch(e) { alert('Error calculating calories.'); }
+}
+</script>
+{% endblock %}
