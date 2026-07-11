@@ -1,0 +1,31 @@
+# ============================================================
+# IBM Watsonx.ai Configuration
+# ============================================================
+# Get your API key from: https://cloud.ibm.com/iam/apikeys
+IBM_API_KEY=your_ibm_cloud_api_key_here
+
+# Watsonx.ai Project ID — find it in your Watsonx project settings
+WATSONX_PROJECT_ID=your_watsonx_project_id_here
+
+# Watsonx.ai API endpoint (default: Dallas region)
+WATSONX_URL=https://us-south.ml.cloud.ibm.com
+
+# IBM Granite Model ID — must match what's available in your Watsonx.ai plan.
+# Check your available models at: Watsonx > Deployments > Foundation Models
+# ibm/granite-4-h-small           (recommended — newest Granite chat model)
+# ibm/granite-3-1-8b-base         (base/completion only, not chat)
+# meta-llama/llama-3-3-70b-instruct (Llama fallback if Granite unavailable)
+GRANITE_MODEL_ID=ibm/granite-4-h-small
+
+# ============================================================
+# Flask Application Settings
+# ============================================================
+FLASK_SECRET_KEY=fitness-buddy-super-secret-key-change-in-production
+FLASK_ENV=development
+FLASK_DEBUG=True
+
+# ============================================================
+# Application Settings
+# ============================================================
+APP_NAME=Fitness Buddy AI
+APP_VERSION=1.0.0
